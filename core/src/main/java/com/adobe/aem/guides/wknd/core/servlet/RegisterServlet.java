@@ -92,7 +92,7 @@ public class RegisterServlet extends SlingAllMethodsServlet {
         param.put(ResourceResolverFactory.SUBSERVICE, "dataWriteService");
 
         try (ResourceResolver resolver = resourceResolverFactory.getServiceResourceResolver(param)) {
-            Resource userRoot = resolver.getResource("/content/user");
+            Resource userRoot = resolver.getResource("/content/users");
             Resource adminRoot = resolver.getResource("/content/admin");
             if (userRoot == null || adminRoot == null) {
                 response.setStatus(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);

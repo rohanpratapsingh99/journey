@@ -110,7 +110,7 @@ public class LoginApiServlet extends SlingAllMethodsServlet {
             Resource userResource = null;
 
             // Check under /content/user/<user>
-            userResource = resolver.getResource("/content/user/" + userId);
+            userResource = resolver.getResource("/content/users/" + userId);
             if (userResource != null && passwordMatches(userResource, password)) {
                 userType = "user";
                 userLevel = "level1";
