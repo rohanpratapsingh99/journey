@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="cq:Page">
+    <jcr:content
+        cq:deviceGroups="[mobile/groups/responsive]"
+        cq:lastModified="{Date}2024-10-29T17:39:51.326+05:30"
+        cq:lastModifiedBy="admin"
+        cq:template="/conf/wknd/settings/wcm/templates/login-signup-user-template"
+        jcr:primaryType="cq:PageContent"
+        sling:resourceType="wknd/components/page">
+        <root
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="wknd/components/container"
+            layout="responsiveGrid">
+            <experiencefragment
+                cq:styleIds="[1568592491109]"
+                jcr:created="{Date}2024-10-29T17:38:16.945+05:30"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2024-10-29T17:38:48.188+05:30"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="wknd/components/experiencefragment"
+                fragmentVariationPath="/content/experience-fragments/wknd/language-masters/en/site/header-without-navigation/master"/>
+            <container
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="wknd/components/container"
+                editable="{Boolean}true"/>
+            <experiencefragment_1500115476
+                cq:styleIds="[1568592503946]"
+                jcr:created="{Date}2024-10-29T17:38:22.981+05:30"
+                jcr:createdBy="admin"
+                jcr:lastModified="{Date}2024-10-29T17:39:30.800+05:30"
+                jcr:lastModifiedBy="admin"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="wknd/components/experiencefragment"
+                fragmentVariationPath="/content/experience-fragments/wknd/language-masters/en/site/footer-without-navigation/master"/>
+        </root>
+        <cq:responsive jcr:primaryType="nt:unstructured">
+            <breakpoints jcr:primaryType="nt:unstructured">
+                <phone
+                    jcr:primaryType="nt:unstructured"
+                    title="Smaller Screen"
+                    width="{Long}768"/>
+                <tablet
+                    jcr:primaryType="nt:unstructured"
+                    title="Tablet"
+                    width="{Long}1200"/>
+            </breakpoints>
+        </cq:responsive>
+    </jcr:content>
+</jcr:root>

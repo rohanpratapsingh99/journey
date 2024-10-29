@@ -27,6 +27,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cypress-eaas": "file:",
     "eslint-plugin-chai-friendly": "^1.0.1",
     "eslint-plugin-cypress": "^3.5.0"
   }

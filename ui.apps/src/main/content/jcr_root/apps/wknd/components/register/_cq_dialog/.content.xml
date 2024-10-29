@@ -34,7 +34,7 @@
                                         fieldLabel="Post Register Login Page"
                                         name="./loginPath"
                                         required="{Boolean}true"
-                                        rootPath="/content/journeymate"/>
+                                        rootPath="/content/wknd"/>
                                     <username
                                         jcr:primaryType="nt:unstructured"
                                         sling:resourceType="granite/ui/components/coral/foundation/form/textfield"

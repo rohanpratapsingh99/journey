@@ -61,6 +61,7 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "aem-wknd-theme": "file:",
     "jquery": "^3.4.1",
     "normalize-scss": "^7.0.1"
   },
