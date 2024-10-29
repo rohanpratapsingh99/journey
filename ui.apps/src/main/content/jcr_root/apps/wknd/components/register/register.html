@@ -1,0 +1,100 @@
+<div data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html" class="jj" id="log-in">
+      <div class="cmp-title">
+            <h1 class="cmp-title__text">${properties.registerLabel} User</h1>
+      </div>
+      <div class="cmp-container">
+            <div class="text">
+                  <div class="cmp-form-text">
+                        <input class="cmp-form-text__text" type="text" id="username" placeholder="${properties.usernameLabel}" required>
+                  </div>
+            </div>
+            <div class="text">
+                  <div class="cmp-form-text">
+                        <input class="cmp-form-text__text" type="text" id="firstname" placeholder="${properties.firstnameLabel}" required>
+                  </div>
+            </div>
+            <div class="text">
+                  <div class="cmp-form-text">
+                        <input class="cmp-form-text__text" type="text" id="lastname" placeholder="${properties.lastnameLabel}" required>
+                  </div>
+            </div>
+            <div class="text">
+                  <div class="cmp-form-text">
+                        <input class="cmp-form-text__text" type="password" id="password" placeholder="${properties.passwordLabel}" required>
+                  </div>
+            </div>
+            <div class="text">
+                  <div class="cmp-form-text">
+                        <input class="cmp-form-text__text" type="tel" id="mobile" placeholder="${properties.mobileLabel}" required>
+                  </div>
+            </div>
+            <div class="text">
+                  <div class="cmp-form-text">
+                        <input class="cmp-form-text__text" type="email" id="email" placeholder="${properties.emailLabel}" required>
+                  </div>
+            </div>
+            <div class="button">
+                  <button type="submit" data-login="${properties.loginPath @ selectors='content', extension = 'html'}"
+                        class="cmp-form-button" id="register-btn">${properties.registerLabel}</button>
+            </div>
+      </div>
+
+</div>
+<sly data-sly-call="${placeholderTemplate.placeholder @ isEmpty=!hasContent}"></sly>
+
+<script>
+      document.addEventListener('DOMContentLoaded', () => {
+            const registerForm = document.getElementById('register-form')
+            const registerButton = document.getElementById('register-btn');
+
+            // Accessing data attributes:
+            const loginPagePath = registerButton.dataset.login;
+
+            const register = async () => {
+                  const email = document.getElementById('email').value;
+                  const username = document.getElementById('username').value;
+                  const password = document.getElementById('password').value;
+                  const firstname = document.getElementById('firstname').value;
+                  const lastname = document.getElementById('lastname').value;
+                  const mobile = document.getElementById('mobile').value;
+
+                  // send API call
+                  const user = {
+                        email,
+                        username,
+                        password,
+                        firstname,
+                        lastname,
+                        mobile,
+                  }
+
+                  try {
+                        const response = await fetch('http://localhost:4502/bin/registeruser', {
+                              method: 'POST',
+                              headers: {
+                                    'Content-Type': 'application/json'
+                              },
+                              body: JSON.stringify(user)
+                        });
+
+                        if (response.ok) {
+                              alert('Registration Successfull please login');
+                              window.location.href = loginPagePath;
+                        }
+                        else {
+                              alert('register failed')
+                        }
+                  }
+                  catch (error) {
+                        console.error('Error:', error);
+                        alert('an error occuered');
+                  }
+            }
+
+            registerButton.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  register();
+
+            });
+      })
+</script>
