@@ -20,14 +20,16 @@
       data-sly-use.config="com.adobe.aem.guides.wknd.core.models.ConfigRetriever"
       data-sly-use.footer="footer.html"
       data-sly-use.redirect="redirect.html">
-    <head data-sly-call="${head.head @ page = page, pwa = pwa}"></head>
+    <head data-sly-call="${head.head @ page = page, pwa = pwa}">alert("Hello! I am an alert box!!");
+</head>
     <body class="${page.cssClassNames}"
-          id="${page.id}"
+          id="${page.id}"    
+          data-difpage="yes"
           data-cmp-link-accessibility-enabled
           data-loginpage="${config.loginPage @ selectors='content', extension = 'html'}"
           data-signuppage="${config.signUpPage}"
           data-adminconsolepage="${config.adminConsolePage @ selectors='content', extension = 'html'}"
-          data-homePage="${config.homePage  @ selectors='content', extension = 'html'}"
+          data-homepage="${config.homePage  @ selectors='content', extension = 'html'}"
           data-cmp-link-accessibility-text="${'opens in a new tab' @ i18n}"
           data-cmp-data-layer-enabled="${page.data ? true : false}"
           data-cmp-data-layer-name="${page.dataLayerName @ context='scriptToken'}">

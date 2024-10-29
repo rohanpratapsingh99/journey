@@ -5,34 +5,42 @@
       <div class="cmp-container">
             <div class="text">
                   <div class="cmp-form-text">
-                        <input class="cmp-form-text__text" type="text" id="username" placeholder="${properties.usernameLabel}" required>
+                        <input class="cmp-form-text__text" type="text" id="username"
+                              placeholder="${properties.usernameLabel}" required>
                   </div>
             </div>
             <div class="text">
                   <div class="cmp-form-text">
-                        <input class="cmp-form-text__text" type="text" id="firstname" placeholder="${properties.firstnameLabel}" required>
+                        <input class="cmp-form-text__text" type="text" id="firstname"
+                              placeholder="${properties.firstnameLabel}" required>
                   </div>
             </div>
             <div class="text">
                   <div class="cmp-form-text">
-                        <input class="cmp-form-text__text" type="text" id="lastname" placeholder="${properties.lastnameLabel}" required>
+                        <input class="cmp-form-text__text" type="text" id="lastname"
+                              placeholder="${properties.lastnameLabel}" required>
                   </div>
             </div>
             <div class="text">
                   <div class="cmp-form-text">
-                        <input class="cmp-form-text__text" type="password" id="password" placeholder="${properties.passwordLabel}" required>
+                        <input class="cmp-form-text__text" type="password" id="password"
+                              placeholder="${properties.passwordLabel}" required>
                   </div>
             </div>
             <div class="text">
                   <div class="cmp-form-text">
-                        <input class="cmp-form-text__text" type="tel" id="mobile" placeholder="${properties.mobileLabel}" required>
+                        <input class="cmp-form-text__text" type="tel" id="mobile"
+                              placeholder="${properties.mobileLabel}" required>
                   </div>
             </div>
             <div class="text">
                   <div class="cmp-form-text">
-                        <input class="cmp-form-text__text" type="email" id="email" placeholder="${properties.emailLabel}" required>
+                        <input class="cmp-form-text__text" type="email" id="email"
+                              placeholder="${properties.emailLabel}" required>
                   </div>
             </div>
+
+            <div id="error-message" class="error-message" style="color: red;"></div>
             <div class="button">
                   <button type="submit" data-login="${properties.loginPath @ selectors='content', extension = 'html'}"
                         class="cmp-form-button" id="register-btn">${properties.registerLabel}</button>
@@ -46,11 +54,52 @@
       document.addEventListener('DOMContentLoaded', () => {
             const registerForm = document.getElementById('register-form')
             const registerButton = document.getElementById('register-btn');
+            const errorMessageDiv = document.getElementById('error-message');
 
             // Accessing data attributes:
             const loginPagePath = registerButton.dataset.login;
 
+
+            const displayError = (message) => {
+                  errorMessageDiv.textContent = message;
+                  errorMessageDiv.style.display = 'block';
+            }
+
+            const validateForm = () => {
+                  const email = document.getElementById('email').value;
+                  const username = document.getElementById('username').value;
+                  const password = document.getElementById('password').value;
+                  const firstname = document.getElementById('firstname').value;
+                  const lastname = document.getElementById('lastname').value;
+                  const mobile = document.getElementById('mobile').value;
+
+                  if (!email || !username || !password || !firstname || !lastname || !mobile) {
+                        displayError('All fields are required!');
+                        return false;
+                  }
+
+                  // const emailPattern = /^[^\s@]+@[@\s@]+\.[^\s@]+$/;
+                  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                  if (!emailPattern.test(email)) {
+                        displayError('Please enter a valid email address');
+                        return false;
+                  }
+
+                  const mobilePattern = /^[0-9]{10}$/;
+                  if (!mobilePattern.test(mobile)) {
+                        displayError('Please enter a valid 10 digit mobile number');
+                        return false;
+                  }
+
+                  errorMessageDiv.style.display = 'none';
+                  return true;
+            }
+
             const register = async () => {
+                  if (!validateForm()) {
+                        return;
+                  }
+
                   const email = document.getElementById('email').value;
                   const username = document.getElementById('username').value;
                   const password = document.getElementById('password').value;
@@ -82,12 +131,13 @@
                               window.location.href = loginPagePath;
                         }
                         else {
-                              alert('register failed')
+                              const errorData = await response.json();
+                              displayError(errorData.error || 'Registration failed. Please try again');
                         }
                   }
                   catch (error) {
                         console.error('Error:', error);
-                        alert('an error occuered');
+                        displayError('An error occurred. Please try again');
                   }
             }
 

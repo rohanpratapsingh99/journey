@@ -2,10 +2,10 @@
 <jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0"
     jcr:primaryType="cq:Template">
     <jcr:content
-        cq:lastModified="{Date}2020-07-09T08:31:28.919-07:00"
+        cq:lastModified="{Date}2024-10-30T03:07:16.314+05:30"
         cq:lastModifiedBy="admin"
-        cq:templateType="/conf/wknd/settings/wcm/template-types/empty-experience-fragment"
+        cq:templateType="/conf/wknd/settings/wcm/template-types/empty-page"
         jcr:primaryType="cq:PageContent"
-        jcr:title="Experience Fragment Web Variation Template"
+        jcr:title="Admin Template"
         status="enabled"/>
 </jcr:root>

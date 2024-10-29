@@ -16,25 +16,36 @@
 
 <!--/* Sign In/Sign Out Buttons for WKND Site */-->
 
-<div data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html"
-     data-sly-test.hasContent="${properties.signInLabel != '' && properties.signInXfPath != '' && properties.signOutLabel != '' && properties.signOutXfPath != '' }"
-     class="wknd-sign-in-buttons"
-     data-current-user-url="/libs/granite/security/currentuser.json">
 
-    <span
-       class="wknd-sign-in-buttons__button wknd-sign-in-buttons__button--greeting"
-       id="wkndGreetingLabel"
-       >${properties.greetingLabel @ i18n}</span>
+<div data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html" class="wknd-sign-in-buttons"
+   style="display: flex;" data-current-user-url="">
 
-    <a href="#sign-in"
-       class="wknd-sign-in-buttons__button wknd-sign-in-buttons__button--sign-in"
-       data-modal-url="${ properties.signInXfPath @ selectors='content', extension = 'html'}"
-       data-sly-test="${properties.signInLabel != '' }">${properties.signInLabel}</a>
+   <span class="wknd-sign-in-buttons__button wknd-sign-in-buttons__button--greeting" id="wkndGreetingLabel"
+      style="display: block;"></span>
 
-    <a href="#sign-out"
-       class="wknd-sign-in-buttons__button wknd-sign-out-buttons__button--sign-out"
-       data-modal-url="${ properties.signOutXfPath @ selectors='content', extension = 'html'}"
-       data-sly-test="${properties.signOutLabel != '' }">${properties.signOutLabel}</a>
+
+   <a href="#" class="wknd-sign-in-buttons__button wknd-sign-out-buttons__button--sign-out" id="logout-btn"
+      style="display: block; width: max-content;">${properties.signOutLabel}</a>
 
 </div>
 <sly data-sly-call="${placeholderTemplate.placeholder @ isEmpty=!hasContent}"></sly>
+
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+      const logoutBUtton = document.getElementById('logout-btn');
+      let loginPagePath = document.body.dataset.loginpage;
+
+      const username = sessionStorage.getItem('username');
+      if (username){
+         document.getElementById('wkndGreetingLabel').textContent = username;
+      }
+      // Display username on the UI
+
+      logoutBUtton.addEventListener('click', () => {
+         sessionStorage.removeItem('role');
+         sessionStorage.removeItem('username');
+         window.location.href = loginPagePath;
+      })
+   })
+
+</script>

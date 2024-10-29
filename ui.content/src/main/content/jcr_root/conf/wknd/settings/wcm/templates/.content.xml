@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:rep="internal"
+<jcr:root xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:rep="internal" xmlns:cq="http://www.day.com/jcr/cq/1.0"
     jcr:mixinTypes="[rep:AccessControllable]"
     jcr:primaryType="cq:Page">
     <content-page-template/>
@@ -8,5 +8,6 @@
     <article-page-template/>
     <landing-page-template/>
     <experience-fragment-web-variation-template/>
-	<login-signup-user-template/>
+    <login-signup-user-template/>
+    <admin-template/>
 </jcr:root>
