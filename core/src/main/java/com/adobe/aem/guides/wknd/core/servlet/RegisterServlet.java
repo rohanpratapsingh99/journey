@@ -92,8 +92,8 @@ public class RegisterServlet extends SlingAllMethodsServlet {
         param.put(ResourceResolverFactory.SUBSERVICE, "dataWriteService");
 
         try (ResourceResolver resolver = resourceResolverFactory.getServiceResourceResolver(param)) {
-            Resource userRoot = resolver.getResource("/content/users");
-            Resource adminRoot = resolver.getResource("/content/admin");
+            Resource userRoot = resolver.getResource("/etc/users");
+            Resource adminRoot = resolver.getResource("/etc/admin");
             if (userRoot == null || adminRoot == null) {
                 response.setStatus(SlingHttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("{\"error\":\"User or Admin storage location does not exist\"}");
@@ -101,8 +101,8 @@ public class RegisterServlet extends SlingAllMethodsServlet {
             }
 
             // Check if the username or email already exists in user or admin nodes
-            if (resourceExists(resolver, "/content/user/" + username) || 
-                resourceExists(resolver, "/content/admin/" + username) || 
+            if (resourceExists(resolver, "/etc/user/" + username) || 
+                resourceExists(resolver, "/etc/admin/" + username) || 
                 emailExists(resolver, email, userRoot) || 
                 emailExists(resolver, email, adminRoot)) {
                 

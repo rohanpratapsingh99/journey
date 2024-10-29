@@ -1,0 +1,345 @@
+<style>
+.toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        transition: opacity 0.5s ease;
+    }
+
+    .green {
+        background-color: #4CAF50; /* Green */
+        color: white;
+    }
+
+    .red {
+        background-color: #f44336; /* Red */
+        color: white;
+    }
+/* Modal container */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 69px; /* Offset to accommodate sticky header height */
+    width: 100%;
+    height: calc(100% - 69px); /* Adjust height based on header */
+    background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+    overflow: auto; /* Enable scrolling */
+}
+/* QR code styling */
+    .qr-code-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    #qrCode {
+        width: 150px;
+        height: 150px;
+    }
+
+    /* Validation error styling */
+    .error-outline {
+        border: 2px solid red;
+    }
+
+/* Modal content */
+.modal-content {
+    background-color: #fff;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%; /* Increased width for more space */
+    max-height: 90vh; /* Limit height to avoid overflow */
+    overflow-y: auto; /* Scroll within modal content */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* Hide Adventure Title and Adventure ID fields */
+.hidden-field {
+    display: none;
+}
+
+/* Close button */
+.close-btn {
+    color: #aaa;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    right: 16px;
+    top: 10px;
+    cursor: pointer;
+}
+
+/* Enhanced form elements */
+.modal-content label {
+    font-weight: bold;
+    display: block;
+    margin: 8px 0 4px;
+}
+
+.modal-content input[type="text"], .modal-content input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 4px 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.modal-content input:required {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Button styling */
+#addTravellerBtn, #submitBookingBtn {
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+#addTravellerBtn:hover, #submitBookingBtn:hover {
+    background-color: #0056b3;
+}
+
+
+</style>
+<div data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html"
+	data-sly-use.model="com.adobe.aem.guides.wknd.core.models.BookNowModel">
+     <div class="button">
+                  <button type="SUBMIT" data-price="${model.price}"
+                        data-adventuretitle="${model.adventureTitle}"
+                        data-adventureid="${model.adventureSlug}"
+                        class="cmp-form-button" id="login-btn">${properties.bookNow}</button>
+            </div>
+</div>
+<div id="bookingModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <br><br><br>
+        <h2>Booking Details</h2>
+        
+        <!-- Pre-populated fields -->
+        <div>
+            <input type="hidden" class="cmp-text" id="adventureTitle" readonly />
+        </div>
+        <div>
+            <label>Price per Person:</label>
+            <input type="text" id="adventurePrice" readonly />
+        </div>
+        <div>
+            <input type="hidden" id="adventureId" readonly />
+        </div>
+
+        <!-- Traveler Details Table -->
+        <h3>Traveler Details</h3>
+        <table id="travellerTable">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Name*</th>
+                    <th>ID Number*</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button id="addTravellerBtn">Add Traveller</button>
+
+        <!-- Total Amount and Payment Section -->
+        <div>
+            <label>Total Amount:</label>
+            <input type="text" id="totalAmount" readonly />
+        </div>
+        <div class="qr-code-container">
+            <img src="/content/dam/wknd/Untitled.png" alt="QR Code" id="qrCode">
+            <p>Pay Here</p>
+        </div>
+        <div>
+            <label>UPI Transaction Number*:</label>
+            <input type="text" id="transactionNumber" required />
+        </div>
+        <button id="submitBookingBtn">Submit Booking</button>
+    </div>
+</div>
+
+<sly data-sly-call="${placeholderTemplate.placeholder @ isEmpty=!hasContent}"></sly>
+<script>
+document.getElementById("login-btn").addEventListener("click", function () {
+    const price = parseFloat(this.getAttribute("data-price"));
+    const adventureTitle = this.getAttribute("data-adventuretitle");
+    const adventureId = this.getAttribute("data-adventureid");
+
+    // Set hidden fields with adventure data
+    document.getElementById("adventurePrice").value = price;
+    document.getElementById("adventureTitle").value = adventureTitle;
+    document.getElementById("adventureId").value = adventureId;
+
+    // Set initial total amount to 0 if no travelers
+    document.getElementById("totalAmount").value = 0;
+
+    // Show modal
+    document.getElementById("bookingModal").style.display = "block";
+    window.scrollTo(0, 0); // Ensure modal is at the top for visibility
+});
+
+// Function to close modal
+document.querySelector(".close-btn").addEventListener("click", closeModal);
+window.addEventListener("click", function (event) {
+    if (event.target === document.getElementById("bookingModal")) {
+        closeModal();
+    }
+});
+
+function closeModal() {
+    document.getElementById("bookingModal").style.display = "none";
+}
+
+// Update total cost when adding/removing travelers
+document.getElementById("addTravellerBtn").addEventListener("click", function () {
+    const table = document.getElementById("travellerTable").getElementsByTagName("tbody")[0];
+    const rowCount = table.rows.length;
+    const row = table.insertRow(rowCount);
+
+    row.insertCell(0).innerText = rowCount + 1; // Set the serial number
+    row.insertCell(1).innerHTML = '<input type="text" name="fullName" required />';
+    row.insertCell(2).innerHTML = '<input type="text" name="idNumber" required />';
+    row.insertCell(3).innerHTML = '<button class="removeTravellerBtn">Remove</button>';
+
+    updateTotalAmount();
+
+    // Add click event for removing row
+    row.querySelector(".removeTravellerBtn").addEventListener("click", function () {
+        row.remove();
+        renumberRows();
+        updateTotalAmount();
+    });
+});
+
+// Function to renumber rows after removal
+function renumberRows() {
+    const rows = document.getElementById("travellerTable").getElementsByTagName("tbody")[0].rows;
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].cells[0].innerText = i + 1;
+    }
+}
+
+// Update total cost based on number of travelers
+function updateTotalAmount() {
+    const price = parseFloat(document.getElementById("adventurePrice").value);
+    const travellerCount = document.getElementById("travellerTable").getElementsByTagName("tbody")[0].rows.length;
+    const totalAmount = travellerCount > 0 ? price * travellerCount : 0;
+    document.getElementById("totalAmount").value = totalAmount;
+}
+
+// Validate fields and submit booking data
+document.getElementById("submitBookingBtn").addEventListener("click", function () {
+    const travellers = [];
+    const rows = document.getElementById("travellerTable").getElementsByTagName("tbody")[0].rows;
+    const bookingDate = new Date().toISOString();
+    let isValid = true;
+
+    for (let i = 0; i < rows.length; i++) {
+        const fullNameInput = rows[i].cells[1].getElementsByTagName("input")[0];
+        const idNumberInput = rows[i].cells[2].getElementsByTagName("input")[0];
+
+        // Check for empty fields and highlight if necessary
+        if (!fullNameInput.value.trim()) {
+            fullNameInput.classList.add("error-outline");
+            isValid = false;
+        } else {
+            fullNameInput.classList.remove("error-outline");
+        }
+
+        if (!idNumberInput.value.trim()) {
+            idNumberInput.classList.add("error-outline");
+            isValid = false;
+        } else {
+            idNumberInput.classList.remove("error-outline");
+        }
+
+        travellers.push({
+            fullName: fullNameInput.value,
+            idNumber: idNumberInput.value
+        });
+    }
+
+    // Check UPI transaction field for required input
+    const transactionNumberInput = document.getElementById("transactionNumber");
+    if (!transactionNumberInput.value.trim()) {
+        transactionNumberInput.classList.add("error-outline");
+        isValid = false;
+    } else {
+        transactionNumberInput.classList.remove("error-outline");
+    }
+
+    // Prevent submission if validation failed
+    if (!isValid) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+        const username = sessionStorage.getItem("username"); // Assuming you stored the username in sessionStorage
+
+
+    const bookingData = {
+        adventureTitle: document.getElementById("adventureTitle").value,
+        pricePerPerson: document.getElementById("adventurePrice").value,
+        adventureId: document.getElementById("adventureId").value,
+        totalAmount: document.getElementById("totalAmount").value,
+        transactionNumber: transactionNumberInput.value,
+        bookingDate: bookingDate,
+        travellers: travellers,
+		username:username
+    };
+
+    // Submit booking data
+    fetch("/bin/updatebooking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bookingData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Booking successful!");
+			showToast("Booking made successfully!", "green");
+            closeModal();
+        } else {
+            alert("Booking failed: " + data.error);
+			closeModal();
+
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred during booking.");
+    });
+});
+
+function showToast(message, color) {
+    const toast = document.createElement("div");
+    toast.className = "toast " + color; // Add the color class
+    toast.innerText = message;
+    document.body.appendChild(toast);
+
+    // Remove the toast after 20 seconds
+    setTimeout(() => {
+        document.body.removeChild(toast);
+    }, 20000);
+}
+
+</script>
