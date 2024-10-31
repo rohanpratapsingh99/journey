@@ -1,0 +1,106 @@
+<div data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html">
+</div>
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    table, th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
+<sly data-sly-call="${placeholderTemplate.placeholder @ isEmpty=!hasContent}"></sly>
+
+<h2>User Bookings</h2>
+<div id="booking-table-container"></div>
+
+<script>
+    // Fetch the user ID from sessionStorage
+    const userId = sessionStorage.getItem('username');
+
+    if (!userId) {
+        document.getElementById('booking-table-container').innerText = 'No user ID found in session.';
+    } else {
+        // Fetch booking data using the user ID
+        async function fetchBookingData(userId) {
+            try {
+                const response = await fetch('/bin/fetch_booking?id=' + userId);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                displayBookings(data);
+            } catch (error) {
+                console.error('Failed to fetch booking data:', error);
+            }
+        }
+
+        // Function to display booking data in a table
+        function displayBookings(data) {
+            const container = document.getElementById('booking-table-container');
+            container.innerHTML = '';
+
+            if (!data.users || data.users.length === 0) {
+                container.innerText = 'No bookings found for the user.';
+                return;
+            }
+
+            // Create table
+            const table = document.createElement('table');
+
+            // Table headers
+            const headers = [
+                'Booking ID', 'Adventure Title', 'Travellers', 'Price per Pax',
+                'Total Price Paid', 'Transaction Number', 'Booking Date', 'Travel Date',
+                'Booking Status', 'Comment'
+            ];
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.innerText = header;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            // User bookings
+            const user = data.users[0];
+            user.bookings.forEach(booking => {
+                if (Object.keys(booking).length === 0) return; // Skip empty booking objects
+
+                const row = document.createElement('tr');
+
+                // Add booking fields to the row
+                const fields = [
+                    booking.bookingId,
+                    booking.adventureTitle,
+                    booking.travellers,
+                    booking.pricePerPerson,
+                    booking.totalAmount,
+                    booking.transactionNumber,
+                    booking.bookingDate,
+                    booking.travelDate,
+                    booking.actionType, // Booking Status
+                    booking.notes // Comment
+                ];
+
+                fields.forEach(field => {
+                    const td = document.createElement('td');
+                    td.innerText = field || 'N/A';
+                    row.appendChild(td);
+                });
+
+                table.appendChild(row);
+            });
+
+            container.appendChild(table);
+        }
+
+        // Fetch and display bookings
+        fetchBookingData(userId);
+    }
+</script>

@@ -115,6 +115,27 @@
     background-color: #0056b3;
 }
 
+.date-picker-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+input[type="date"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input[type="date"]:focus {
+    border-color: #007BFF;
+}
+
 
 </style>
 <div data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html"
@@ -146,6 +167,11 @@
 
         <!-- Traveler Details Table -->
         <h3>Traveler Details</h3>
+        <!-- Date picker -->
+        <div class="date-picker-container">
+            <label for="datePicker">Select a date:</label>
+            <input type="date" id="datePicker" required>
+        </div>
         <table id="travellerTable">
             <thead>
                 <tr>
@@ -179,6 +205,7 @@
 
 <sly data-sly-call="${placeholderTemplate.placeholder @ isEmpty=!hasContent}"></sly>
 <script>
+
 document.getElementById("login-btn").addEventListener("click", function () {
     const price = parseFloat(this.getAttribute("data-price"));
     const adventureTitle = this.getAttribute("data-adventuretitle");
@@ -246,11 +273,20 @@ function updateTotalAmount() {
     document.getElementById("totalAmount").value = totalAmount;
 }
 
+// Date picker 
+document.getElementById('datePicker').addEventListener('click', ()=>{
+    const today = new Date().toISOString().split('T')[0];
+    datePicker.setAttribute('min', today);
+})
+    
+
+
 // Validate fields and submit booking data
 document.getElementById("submitBookingBtn").addEventListener("click", function () {
     const travellers = [];
     const rows = document.getElementById("travellerTable").getElementsByTagName("tbody")[0].rows;
-    const bookingDate = new Date().toISOString();
+    // const bookingDate = new Date().toISOString();
+    const bookingDate = document.getElementById('datePicker');
     let isValid = true;
 
     for (let i = 0; i < rows.length; i++) {
@@ -294,38 +330,44 @@ document.getElementById("submitBookingBtn").addEventListener("click", function (
     }
         const username = sessionStorage.getItem("username"); // Assuming you stored the username in sessionStorage
 
+        const dateItem = new Date();
+const year = dateItem.getFullYear();
+const month = String(dateItem.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+const day = String(dateItem.getDate()).padStart(2, '0');
+const formattedDate = year + '-' + month + '-' + day;
 
-    const bookingData = {
+        const bookingData = {
         adventureTitle: document.getElementById("adventureTitle").value,
         pricePerPerson: document.getElementById("adventurePrice").value,
         adventureId: document.getElementById("adventureId").value,
         totalAmount: document.getElementById("totalAmount").value,
         transactionNumber: transactionNumberInput.value,
-        bookingDate: bookingDate,
+        bookingDate: bookingDate.value,
+        transactionDate: formattedDate,
         travellers: travellers,
 		username:username
     };
 
     // Submit booking data
-    fetch("/bin/updatebooking", {
+    fetch("/bin/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
+    .then(response => {
+        if (response.ok) {
             alert("Booking successful!");
 			showToast("Booking made successfully!", "green");
             closeModal();
-        } else {
-            alert("Booking failed: " + data.error);
+        }
+        else {
+            alert("Booking failed");
 			closeModal();
-
         }
     })
     .catch(error => {
         console.error("Error:", error);
+        console.log('error ')
         alert("An error occurred during booking.");
     });
 });

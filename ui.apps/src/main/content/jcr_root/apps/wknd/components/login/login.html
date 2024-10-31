@@ -11,7 +11,7 @@
             </div>
             <div class="text">
                   <div class="cmp-form-text">
-                        <input class="cmp-form-text__text" type="text" id="password"
+                        <input class="cmp-form-text__text" type="password" id="password"
                               placeholder="${properties.passwordLabel}" required>
                   </div>
             </div>
@@ -71,7 +71,7 @@
                   const password = passwordInput.value;
 
                   try {
-                        const response = await fetch('http://localhost:4502/bin/loginuser', {
+                        const response = await fetch('/bin/loginuser', {
                               method: 'POST',
                               headers: {
                                     'Content-Type': 'application/json'

@@ -1,0 +1,250 @@
+<div
+  data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html"
+></div>
+<style>
+  .collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+
+  .active,
+  .collapsible:hover {
+    background-color: #555;
+  }
+
+  .content {
+    padding: 0 15px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .approve {
+    background-color: green;
+    color: white;
+    margin-right: 10px;
+  }
+  .reject {
+    background-color: red;
+    color: white;
+  }
+  .approved {
+    background-color: green;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+  }
+  .rejected {
+    background-color: red;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+  }
+</style>
+
+<h2>User Bookings</h2>
+<div id="booking-table-container"></div>
+
+<sly
+  data-sly-call="${placeholderTemplate.placeholder @ isEmpty=!hasContent}"
+></sly>
+
+<script>
+  const role = sessionStorage.getItem("role");
+  async function fetchBookingData() {
+    try {
+      const response = await fetch("/bin/fetch_booking");
+      if (!response.ok) throw new Error("Network response was not ok");
+      const data = await response.json();
+      displayBookings(data);
+    } catch (error) {
+      console.error("Failed to fetch booking data:", error);
+    }
+  }
+
+  async function updateBooking(actionType, bookingId, username, notes = "") {
+    const payload = { username, bookingId, actionType, notes };
+    try {
+      const response = await fetch("/bin/updateAction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      console.log("reso", response);
+      if (!response.ok) {
+        console.log("response ok");
+        throw new Error("Network response was not ok");
+      }
+
+      if (response.ok) {
+        return true; // Return the data if successful
+      }
+
+      // return await response.json();
+    } catch (error) {
+      console.error(`Failed to booking :`, error);
+      return null;
+    }
+  }
+
+  function displayBookings(data) {
+    const container = document.getElementById("booking-table-container");
+    container.innerHTML = "";
+
+    data.users.forEach((user) => {
+      const userButton = document.createElement("button");
+      userButton.className = "collapsible";
+      userButton.textContent = user.username;
+      container.appendChild(userButton);
+
+      const contentDiv = document.createElement("div");
+      contentDiv.className = "content";
+      const table = document.createElement("table");
+
+      const headers = [
+        "Booking ID",
+        "Travelling Details",
+        "Price per Pax",
+        "Total Price Paid",
+        "Transaction Details",
+        "Date of Journey",
+        "Action",
+        "Comments",
+      ];
+      const headerRow = document.createElement("tr");
+      headers.forEach((header) => {
+        const th = document.createElement("th");
+        th.innerText = header;
+        headerRow.appendChild(th);
+      });
+      table.appendChild(headerRow);
+
+      user.bookings.forEach((booking) => {
+        const row = document.createElement("tr");
+        const details = [
+          booking.bookingId,
+          booking.travellers,
+          booking.pricePerPerson,
+          booking.totalAmount,
+          booking.transactionNumber,
+          booking.travelDate,
+        ];
+        details.forEach((detail) => {
+          const td = document.createElement("td");
+          td.innerText = detail || "N/A";
+          row.appendChild(td);
+        });
+
+        // Action column
+        const actionTd = document.createElement("td");
+        if (booking.actionType === "") {
+          const approveButton = document.createElement("button");
+          approveButton.className = "approve";
+          approveButton.innerText = "Approve";
+          approveButton.addEventListener("click", async () => {
+            const result = await updateBooking(
+              "Approved",
+              booking.bookingId,
+              user.username
+            );
+            if (result) {
+              console.log("working");
+              actionTd.innerHTML = '<span class="approved">Approved</span>';
+            }
+          });
+
+          const rejectButton = document.createElement("button");
+          rejectButton.className = "reject";
+          rejectButton.innerText = "Reject";
+          rejectButton.addEventListener("click", () => {
+            const commentTd = row.querySelector(".comment-input");
+            commentTd.innerHTML = `
+                            <input type="text" placeholder="Enter rejection reason" />
+                            <button class="approve">OK</button>
+                            <button class="reject">Cancel</button>
+                        `;
+            const okButton = commentTd.querySelector(".approve");
+            const cancelButton = commentTd.querySelector(".reject");
+            const inputField = commentTd.querySelector("input");
+
+            okButton.addEventListener("click", async () => {
+              const notes = inputField.value.trim();
+              if (notes) {
+                const result = await updateBooking(
+                  "Rejected",
+                  booking.bookingId,
+                  user.username,
+                  notes
+                );
+                if (result) {
+                  actionTd.innerHTML = '<span class="rejected">Rejected</span>';
+                  commentTd.innerText = notes;
+                }
+              }
+            });
+
+            cancelButton.addEventListener("click", () => {
+              commentTd.innerHTML = booking.notes || "";
+            });
+          });
+
+          actionTd.appendChild(approveButton);
+          actionTd.appendChild(rejectButton);
+        } else if (booking.actionType === "Approved") {
+          actionTd.innerHTML = '<span class="approved">Approved</span>';
+        } else if (booking.actionType === "Rejected") {
+          actionTd.innerHTML = '<span class="rejected">Rejected</span>';
+        }
+        row.appendChild(actionTd);
+
+        // Comments column with dynamic input for rejection notes
+        const commentTd = document.createElement("td");
+        commentTd.className = "comment-input";
+        commentTd.innerText = booking.notes || "";
+        row.appendChild(commentTd);
+
+        table.appendChild(row);
+      });
+
+      contentDiv.appendChild(table);
+      container.appendChild(contentDiv);
+
+      userButton.addEventListener("click", function () {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        content.style.display =
+          content.style.display === "block" ? "none" : "block";
+      });
+    });
+  }
+  if (role === "admin") {
+    fetchBookingData();
+  }
+</script>

@@ -15,22 +15,22 @@
 */-->
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const role = sessionStorage.getItem('role');
 
-        
+
         // Accessing data attributes
         let loginPagePath = document.body.dataset.loginpage;
         let homePagePath = document.body.dataset.homepage;
 
         // if not logged-in redirect.
-        if (!role){
+        if (!role) {
             window.location.href = loginPagePath;
         }
 
         // // if logged in but type is not admin then redirect it to user homepage - as there is only 2 type of user
         // // admin and user.
-        
+
         if (role !== 'admin' && role !== null) {
             window.location.href = homePagePath;
         }

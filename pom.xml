@@ -58,7 +58,7 @@
         <bnd.version>5.1.2</bnd.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <aem.sdk.api>2023.7.12874.20230726T072051Z-230702</aem.sdk.api>
+        <aem.sdk.api>2024.10.18311.20241017T104455Z-240900</aem.sdk.api>
         <componentGroupName>WKND Site</componentGroupName>
         <core.wcm.components.version>2.26.0</core.wcm.components.version>
         <uber.jar.version>6.5.17</uber.jar.version>
@@ -354,12 +354,12 @@ Bundle-DocURL:
                     </dependencies>
                 </plugin>
                 <!-- AEM Analyser Plugin -->
-                <plugin>
+                <!-- <plugin>
                     <groupId>com.adobe.aem</groupId>
                     <artifactId>aemanalyser-maven-plugin</artifactId>
                     <version>${aemanalyser.version}</version>
                     <extensions>true</extensions>
-                </plugin>
+                </plugin> -->
                 <!-- Content Package Plugin -->
                 <plugin>
                     <groupId>com.day.jcr.vault</groupId>

@@ -21,7 +21,7 @@
 
   @media (min-width: $screen-medium + 1) {
     display:block;
-    max-width:  $max-width !important;
+    max-width:  100% !important;
     float: unset !important;
     margin: 0 auto !important;
     clear: both !important; 

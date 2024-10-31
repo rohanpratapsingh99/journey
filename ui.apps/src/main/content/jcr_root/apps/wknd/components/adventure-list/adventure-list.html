@@ -1,0 +1,140 @@
+<sly data-sly-use.imageList="com.adobe.aem.guides.wknd.core.models.AdventureListImpl" />
+<style>
+    .image-list-component-adventure {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .search-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 20px;
+}
+
+#search-box {
+    width: 100%;
+    padding: 10px 20px;
+    padding-left: 40px; /* For icon space */
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#search-box:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.search-container::before {
+    content: "🔍";
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #888;
+}
+
+    .cmp-image-list-adventure {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+    }
+
+    .cmp-image-list__item-content-adventure {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .cmp-image-list__item-image-adventure img {
+        width: 100%;
+        height: auto;
+        max-height: 150px;
+        object-fit: cover;
+    }
+
+    .cmp-image-list__item-title-adventure {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
+    }
+
+    .cmp-image-list__item-description-adventure {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .adventure-image{
+        border-radius: 8px;
+
+    }
+    
+</style>
+
+<div   data-sly-use.placeholderTemplate="core/wcm/components/commons/v1/templates.html"
+ class="image-list-component-adventure">
+ <div class="search-container">
+    <input type="text" id="search-box" placeholder="Search..." />
+</div>
+
+    <div class="cmp-image-list-adventure">
+        <sly data-sly-list="${imageList.items}">
+            <article class="cmp-image-list__item-content-adventure">
+                <a class="cmp-image-list__item-image-link"
+                   href="${item.URL}"
+                   data-sly-test="${item.image}">
+                   <div class="cmp-image-list__item-image-adventure">
+                    <img class="adventure-image" src="${item.image}"/>
+                   </div>
+                </a>
+        
+                <a class="cmp-image-list__item-title-link" href="${item.URL}" data-cmp-clickable="${item.data ? true : false}">
+                    <span class="cmp-image-list__item-title-adventure">${item.title}</span>
+                </a>
+        
+                <span class="cmp-image-list__item-description-adventure"
+                      data-sly-test="${item.description}" data-full-description="${item.description}">${item.description}</span>
+            </article>
+        </sly>
+    </div>
+</div>
+<sly
+  data-sly-call="${placeholderTemplate.placeholder @ isEmpty=!hasContent}"
+></sly>
+<script>
+    document.getElementById('search-box').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            executeSearch();
+        }
+    });
+
+    function executeSearch() {
+        const searchText = document.getElementById('search-box').value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('searchtext', searchText);
+        window.location.href = url.toString();
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+        const maxLength = 40; // Set maximum length for description
+
+        document.querySelectorAll(".cmp-image-list__item-description-adventure").forEach(descriptionElement => {
+            const fullText = descriptionElement.getAttribute("data-full-description");
+
+            if (fullText.length > maxLength) {
+                descriptionElement.textContent = fullText.substring(0, maxLength) + "...";
+            } else {
+                descriptionElement.textContent = fullText;
+            }
+        });
+    });
+</script>
