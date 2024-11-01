@@ -37,6 +37,13 @@
                                         name="./fragmentPath"
                                         pickerTitle="Select Content Fragment"
                                         rootPath="/content/dam"/>
+                                    <qr
+                                        jcr:primaryType="nt:unstructured"
+                                        sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
+                                        fieldLabel="QR Code"
+                                        name="./qr"
+                                        required="{Boolean}true"
+                                        rootPath="/content/dam/wknd"/>
                                 </items>
                             </column>
                         </items>
